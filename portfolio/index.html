@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Portafolio de Nicolás Bustamante: automatización QA con Robot Framework, Selenium, APIs, SQL y CI/CD. Casos de transporte, reservas y sincronización offline.">
+  <meta name="theme-color" content="#142d29">
+  <title>Nicolás Bustamante · QA Automation</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="header wrap">
+    <a class="brand" href="#inicio" aria-label="Nicolás Bustamante, inicio"><span class="monogram">nb<span>_</span></span><span>Nicolás Bustamante<small>QA AUTOMATION</small></span></a>
+    <nav aria-label="Principal"><a href="#proyecto">Proyecto</a><a href="#casos">Casos</a><a href="#enfoque">Mi enfoque</a><a class="nav-code" href="https://github.com/Nico2795/Portafolio-QA-">Código <span aria-hidden="true">↗</span></a></nav>
+  </header>
+
+  <main id="contenido">
+    <section class="hero wrap" id="inicio" aria-labelledby="hero-title">
+      <div class="hero-copy"><p class="eyebrow"><span class="dot"></span> AUTOMATIZACIÓN CON CONTEXTO DE NEGOCIO</p>
+        <h1 id="hero-title">La calidad está<br>en los <em>casos difíciles.</em></h1>
+        <p class="hero-description">Soy Nicolás Bustamante. Trabajo en QA de transporte, automatizando flujos críticos e investigando lo que pasa cuando una reserva cambia, un viaje se llena o se pierde la conexión.</p>
+        <div class="actions"><a class="button" href="#proyecto">Explorar mi proyecto <span aria-hidden="true">↓</span></a><a class="text-link" href="reports/report.html">Ver reporte de pruebas <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="route-visual" aria-label="Ciclo de pruebas: reservar, abordar, salir y sincronizar">
+        <div class="visual-top"><span>UN VIAJE. MUCHOS ESCENARIOS.</span><span class="visual-id">QA / 001</span></div>
+        <svg viewBox="0 0 400 300" role="img" aria-labelledby="route-title"><title id="route-title">Flujo de reserva, abordaje y sincronización con un desvío offline</title>
+          <path class="route-muted" d="M65 60 H315 V130 H120 V220 H330"/>
+          <path class="route-line" d="M65 60 H315 V130 H120 V220 H330"/>
+          <path class="route-offline" d="M215 130 V175 H330 V220"/>
+          <g class="stop"><circle cx="65" cy="60" r="8"/><circle cx="315" cy="130" r="8"/><circle cx="120" cy="220" r="8"/><circle cx="330" cy="220" r="8"/></g>
+          <text x="47" y="35">01 / RESERVAR</text><text x="235" y="105">02 / ABORDAR</text><text x="45" y="257">03 / SALIR</text><text x="240" y="257">04 / SINCRONIZAR</text>
+          <text class="offline-label" x="237" y="164">SIN CONEXIÓN</text>
+        </svg>
+        <div class="visual-bottom"><span class="live-dot"></span><span>Probar el recorrido completo.<br><strong>También sus desvíos.</strong></span></div>
+      </div>
+    </section>
+
+    <div class="stack-band"><div class="wrap stack"><span>MI CAJA DE HERRAMIENTAS</span><ul aria-label="Tecnologías del proyecto"><li>Robot Framework</li><li>Selenium</li><li>Python</li><li>REST APIs</li><li>SQL</li><li>GitHub Actions</li></ul></div></div>
+
+    <section class="project wrap section" id="proyecto" aria-labelledby="project-title">
+      <div class="section-heading"><p class="eyebrow">01 / PROYECTO DESTACADO</p><span class="pill">Datos 100% sintéticos</span></div>
+      <div class="project-intro"><h2 id="project-title">Transit QA Lab<span class="period">.</span></h2><p>Un laboratorio de transporte para mostrar cómo abordo la calidad, desde la regla de negocio hasta la evidencia de ejecución.</p></div>
+      <div class="project-layout">
+        <figure class="project-image"><div class="image-bar"><span></span><span></span><span></span><p>transit-qa-lab / entorno de prueba</p></div><img src="assets/demo.png" width="1440" height="1150" alt="Interfaz del laboratorio con compra de pasajes, cambio de asiento, cancelación y operaciones online y offline del conductor" loading="lazy"><figcaption>Interfaz real del sistema bajo prueba. Ejecución local con servidor Python y SQLite.</figcaption></figure>
+        <div class="project-details"><h3>Del pasaje a la sincronización.</h3><p>Compras, asignación de asientos, edición, cancelación y reembolsos. Del lado del conductor: validación de pasajeros, inicio de salida y reconciliación de operaciones offline.</p>
+          <dl class="metrics"><div><dt>Casos automatizados</dt><dd data-total>42</dd></div><div><dt>API + integración</dt><dd>34</dd></div><div><dt>E2E en Chrome</dt><dd>8</dd></div></dl>
+          <p class="verified"><span class="dot"></span> <span id="evidence-status">Evidencia de ejecución disponible en el reporte</span></p>
+          <a class="button" href="reports/report.html">Abrir reporte Robot <span aria-hidden="true">↗</span></a>
+          <a class="text-link project-source" href="https://github.com/Nico2795/Portafolio-QA-">Explorar el repositorio <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="case-section" id="casos" aria-labelledby="cases-title"><div class="wrap section">
+      <p class="eyebrow">02 / LOS CASOS QUE IMPORTAN</p><div class="cases-heading"><h2 id="cases-title">El camino feliz<br>es solo el comienzo.</h2><p>Estos escenarios combinan respuestas HTTP, reglas de negocio y consultas SQL para comprobar también lo que <strong>no debe ocurrir</strong>.</p></div>
+      <div class="case-explorer">
+        <div class="case-picker" role="group" aria-label="Elegir caso de prueba">
+          <button class="case-choice active" data-case="capacity" aria-pressed="true"><span>01</span><div>Un viaje lleno<small>Negativo · Validación</small></div><span aria-hidden="true">↗</span></button>
+          <button class="case-choice" data-case="offline" aria-pressed="false"><span>02</span><div>El último asiento<small>Offline · Sincronización</small></div><span aria-hidden="true">↗</span></button>
+          <button class="case-choice" data-case="refund" aria-pressed="false"><span>03</span><div>Una cancelación, un reembolso<small>Idempotencia · SQL</small></div><span aria-hidden="true">↗</span></button>
+          <button class="case-choice" data-case="race" aria-pressed="false"><span>04</span><div>Dos compras simultáneas<small>Concurrencia · Integridad</small></div><span aria-hidden="true">↗</span></button>
+        </div>
+        <article class="case-detail" id="case-detail" aria-live="polite" aria-atomic="true">
+          <div class="case-meta"><span id="case-id">DRV-002</span><span class="case-tag" id="case-tag">RIESGO CRÍTICO</span></div>
+          <h3 id="case-title">Sin reserva. Sin cupos. Sin validación.</h3><p id="case-description">Un usuario sin reserva intenta abordar un viaje con todos sus asientos asignados. El sistema debe rechazarlo sin crear una reserva ni marcarlo como abordado.</p>
+          <div class="given-then"><div><span>PRECONDICIÓN</span><p id="case-given">Viaje T-FULL · 2 de 2 asientos ocupados · U-002 sin reserva.</p></div><div><span>RESULTADO ESPERADO</span><p id="case-then">HTTP 409 · no_seats. La base de datos conserva sus 3 reservas iniciales.</p></div></div>
+          <pre aria-label="Fragmento de la prueba automatizada"><code id="case-code">${r}=    Validate Passenger    user=U-002
+...    trip=T-FULL    status=409
+Error Should Be    ${r}    no_seats
+No Extra Reservation Should Exist</code></pre>
+          <a class="text-link" id="case-source" href="https://github.com/Nico2795/Portafolio-QA-/blob/main/tests/api/driver.robot">Ver caso en el código <span aria-hidden="true">↗</span></a>
+        </article>
+      </div>
+      <p class="case-note">Explorador de casos documentados. Las ejecuciones y sus resultados se consultan en el reporte Robot.</p>
+    </div></section>
+
+    <section class="wrap section approach" id="enfoque" aria-labelledby="approach-title">
+      <p class="eyebrow">03 / MI FORMA DE TRABAJAR</p><div class="approach-layout"><div><h2 id="approach-title">Automatizar con<br>criterio de QA.</h2><p class="about">En AllRide he construido un framework de pruebas desde cero y participado en mejoras de los procesos de QA. Me interesa entender los flujos críticos, aislar la causa de un error y hacer que la evidencia ayude al equipo a decidir.</p><p class="confidentiality">El código de mi trabajo es confidencial. Este portafolio usa un proyecto independiente, preparado con apoyo de IA, sin datos ni código de mi empleador.</p></div>
+        <ol class="approach-list"><li><span>01</span><div><h3>Entender el riesgo</h3><p>Definir criterios observables con negocio y priorizar capacidad, permisos, reembolsos y operaciones offline.</p></div></li><li><span>02</span><div><h3>Comprobar los efectos</h3><p>Combinar API, interfaz y SQL. Un rechazo debe dejar los datos en el estado correcto.</p></div></li><li><span>03</span><div><h3>Hacer que los fallos se vean</h3><p>Reportes, screenshots ante errores y un defecto controlado que verifica que el caso crítico realmente falla cuando debe.</p></div></li><li><span>04</span><div><h3>Integrarlo a cada entrega</h3><p>Triggers por push, pull request, ejecución manual y semanal. Artefactos descargables y entrega condicionada a los checks.</p></div></li></ol>
+      </div>
+    </section>
+
+    <section class="evidence wrap" aria-labelledby="evidence-title"><div><p class="eyebrow">DEL CÓDIGO A LA EVIDENCIA</p><h2 id="evidence-title">Puedes revisar cada decisión.</h2><p>Casos positivos y negativos, reglas explícitas y límites documentados.</p></div><div class="evidence-links"><a href="reports/report.html">Reporte de ejecución <span aria-hidden="true">↗</span></a><a href="https://github.com/Nico2795/Portafolio-QA-/actions">Pipeline y artefactos <span aria-hidden="true">↗</span></a><a href="https://github.com/Nico2795/Portafolio-QA-/blob/main/docs/test-strategy.md">Estrategia de pruebas <span aria-hidden="true">↗</span></a><a href="https://github.com/Nico2795/Portafolio-QA-/blob/main/docs/defect-example.md">Análisis del defecto <span aria-hidden="true">↗</span></a></div></section>
+  </main>
+  <footer class="wrap footer"><span>Nicolás Bustamante <span aria-hidden="true">/</span> QA Automation</span><a href="https://github.com/Nico2795/Portafolio-QA-">Proyecto, código y documentación <span aria-hidden="true">↗</span></a><span>Transporte ficticio. Pruebas reales.</span></footer>
+</body>
+</html>

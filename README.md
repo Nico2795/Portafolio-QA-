@@ -2,6 +2,10 @@
 
 [![QA pipeline](https://github.com/Nico2795/Portafolio-QA-/actions/workflows/qa.yml/badge.svg)](https://github.com/Nico2795/Portafolio-QA-/actions/workflows/qa.yml)
 
+**[Ver portafolio web público](https://nicolas-bustamante-qa.quick-okapi-8636.chatgpt.site)** · Presentación del proyecto, explorador de casos y reportes Robot accesibles sin iniciar sesión.
+
+La web se encuentra en `portfolio/`. `scripts/build_portfolio.py` prepara una versión estática y exige una ejecución de pruebas completamente aprobada antes de incorporar su evidencia. Ver [mantenimiento y publicación](docs/portfolio.md).
+
 Proyecto demostrativo de QA para operaciones de transporte: **compra de pasajes, asignación de asientos, edición, cancelación, reembolsos y validación/salida del conductor online y offline**.
 
 Robot Framework + Selenium + pruebas REST + SQLite + GitHub Actions. Incluye 42 casos automatizados: 34 de API/integración y 8 E2E en Chrome, con escenarios positivos, negativos, concurrencia y sincronización.

@@ -7,3 +7,5 @@ results/
 .env
 .coverage
 dist/
+_site/
+sites/
