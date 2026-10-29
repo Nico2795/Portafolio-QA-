@@ -1,0 +1,104 @@
+name: QA pipeline
+
+on:
+  push:
+    branches: [main, master, 'codex/**']
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  robot:
+    name: Robot (${{ matrix.suite }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [api, ui]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Execute Robot tests
+        run: python scripts/run_tests.py --suite ${{ matrix.suite }} --output results/${{ matrix.suite }}
+      - name: Upload reports and failure screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-${{ matrix.suite }}-${{ github.run_number }}
+          path: results/${{ matrix.suite }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  detection:
+    name: Verify defect detection
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python scripts/check_detection.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: controlled-defect-${{ github.run_number }}
+          path: results/mutation/
+          retention-days: 14
+
+  performance:
+    name: Local performance probe
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python scripts/performance.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-${{ github.run_number }}
+          path: results/performance/
+          retention-days: 14
+
+  delivery:
+    name: Package validated source
+    needs: [robot, detection, performance]
+    if: >-
+      always() && needs.robot.result == 'success' &&
+      needs.detection.result == 'success' &&
+      (needs.performance.result == 'success' || needs.performance.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qa-portfolio-validated-${{ github.sha }}
+          path: dist/qa-portfolio.zip
+          retention-days: 14

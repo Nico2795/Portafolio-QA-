@@ -1,0 +1,6 @@
+robotframework==7.0.1
+robotframework-requests==0.9.7
+robotframework-seleniumlibrary==6.8.0
+selenium==4.41.0
+requests==2.32.3
+jsonschema==4.25.1

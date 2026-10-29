@@ -1,0 +1,34 @@
+name: Defecto
+description: Reportar un comportamiento reproducible de la demo
+title: '[BUG] '
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Entorno y versión
+      description: Commit, SO, navegador, suite y datos sintéticos utilizados.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado y criterio de aceptación
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Resultado actual e impacto
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidencia y correlación
+      description: Logs, run de Actions, captura, event_id y consulta SQL. Solo datos sintéticos.

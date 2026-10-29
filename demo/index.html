@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transit QA Lab</title>
+<style>
+:root{font:16px system-ui;color:#122b3f;background:#f1f5f8}body{margin:0;padding:32px 20px}
+main{max-width:1000px;margin:auto}header{margin-bottom:24px}small{color:#527080;letter-spacing:.08em}
+h1{font-size:36px;margin:8px 0}h2{margin:0 0 16px;font-size:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+section{background:white;padding:24px;border:1px solid #dce5ec;border-radius:12px}
+label{display:block;margin-top:16px}input,select,button{font:inherit;padding:10px;border:1px solid #acbdc9;border-radius:6px;box-sizing:border-box}
+input,select{width:100%;margin-top:5px}button{cursor:pointer;background:#106b78;color:white;margin:16px 6px 0 0}
+button.secondary{background:white;color:#125b68}button:disabled{opacity:.6;cursor:wait}.status{min-height:48px;margin-top:16px;white-space:pre-line}
+ul{padding-left:20px}footer{font-size:13px;color:#527080;margin-top:24px}.badge{display:inline-block;padding:4px 9px;border-radius:20px;background:#e1f3ef}
+@media(max-width:700px){.grid{grid-template-columns:1fr}body{padding:20px 12px}}
+</style>
+<main>
+<header><small>PORTAFOLIO DE AUTOMATIZACIÓN / DATOS SINTÉTICOS</small><h1>Transit QA Lab</h1>
+<p>Reservas, abordaje y sincronización de viajes.</p><span class="badge">Sin pagos reales · Sin datos de clientes</span></header>
+<div class="grid">
+<section><h2>Pasajero</h2>
+<label for="rider">Usuario demo</label><select id="rider" data-testid="rider"><option>U-002</option><option>U-001</option><option>U-005</option><option>U-006</option></select>
+<label for="rider-trip">Viaje</label><select id="rider-trip" data-testid="rider-trip"><option value="T-001">Terminal → Parque (3 asientos)</option><option value="T-FULL">Terminal → Campus (lleno)</option></select>
+<label for="seat">Asiento</label><input id="seat" data-testid="seat" type="number" min="1" max="3" value="2">
+<button id="buy" data-testid="buy">Comprar · $5.000 CLP</button>
+<label for="reservation">ID de reserva (R-001 pertenece a U-001)</label><input id="reservation" data-testid="reservation" value="">
+<button id="edit" data-testid="edit" class="secondary">Cambiar asiento</button><button id="cancel" data-testid="cancel" class="secondary">Cancelar y reembolsar</button>
+<div class="status" id="rider-message" data-testid="rider-message" role="status" aria-live="polite"></div>
+</section>
+<section><h2>Conductor</h2>
+<label for="driver-trip">Viaje / manifiesto</label><select id="driver-trip" data-testid="driver-trip"><option value="T-001">T-001</option><option value="T-FULL">T-FULL</option></select>
+<button id="refresh" class="secondary" data-testid="refresh">Actualizar manifiesto</button>
+<button id="toggle" class="secondary" data-testid="toggle">Pasar a offline</button>
+<p>Conexión: <strong data-testid="mode" id="mode">online</strong> · Pendientes: <strong data-testid="pending" id="pending">0</strong></p>
+<p data-testid="manifest" id="manifest">Cargando manifiesto…</p><ul id="passengers"></ul>
+<label for="passenger">Usuario a validar</label><input id="passenger" data-testid="passenger" value="U-001">
+<button id="validate" data-testid="validate">Validar pasajero</button><button id="depart" data-testid="depart">Iniciar salida</button>
+<button id="sync" class="secondary" data-testid="sync">Sincronizar cola</button>
+<div class="status" id="driver-message" data-testid="driver-message" role="status" aria-live="polite"></div>
+</section></div>
+<footer>Modelo ficticio inspirado en operaciones de transporte. El modo offline simula desconexión de la aplicación y conserva cola/manifiesto en este navegador. No es una implementación de Allride.</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'transit-qa-driver-v1';
+let state;
+try { state = JSON.parse(localStorage.getItem(KEY)); } catch {}
+state ||= {offline:false, manifest:null, queue:[], history:[]};
+if(state.manifest) $('driver-trip').value = state.manifest.id;
+const errors = {no_seats:'Sin asientos disponibles',seat_taken:'Asiento ocupado',invalid_seat:'Asiento inválido',
+  already_reserved:'Usuario ya tiene reserva',already_validated:'Usuario ya validado',trip_departed:'Viaje ya iniciado',
+  no_boarded_passengers:'No hay pasajeros abordados',not_owner:'Reserva de otro usuario',user_not_found:'Usuario no encontrado',
+  reservation_not_cancellable:'Reserva no cancelable',reservation_not_editable:'Reserva no editable'};
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
+function render(){
+  $('mode').textContent = state.offline ? 'offline' : 'online';
+  $('toggle').textContent = state.offline ? 'Volver a online' : 'Pasar a offline';
+  $('pending').textContent = state.queue.length;
+  const m = state.manifest;
+  $('manifest').textContent = m ? `${m.id} · ${m.available_seats} asientos libres · ${m.status}` : 'Sin manifiesto';
+  $('passengers').replaceChildren();
+  for(const p of m?.passengers || []){
+    const li=document.createElement('li');li.textContent=`${p.user_id} · asiento ${p.seat} · ${p.status}`;$('passengers').append(li);
+  }
+}
+async function api(path,method='GET',body,driver=true){
+  const token=driver ? 'demo-driver-001' : `demo-rider-${$('rider').value}`;
+  const response=await fetch(path,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
+    body:body===undefined ? undefined : JSON.stringify(body)});
+  const result=await response.json();
+  if(!response.ok) throw Error(errors[result.error] || result.error);
+  return result;
+}
+async function loadManifest(){
+  if(state.offline) throw Error('Manifiesto offline: usa la copia local');
+  if(state.queue.length) throw Error('Sincroniza los pendientes antes de actualizar o cambiar viaje');
+  state.manifest=await api(`/api/driver/manifest/${$('driver-trip').value}`); save();
+}
+function offlineEvent(kind){
+  const m=state.manifest;
+  if(!m || m.id!==$('driver-trip').value) throw Error('Falta manifiesto local de este viaje');
+  if(m.status!=='scheduled') throw Error('Viaje ya iniciado');
+  const event={event_id:crypto.randomUUID(),kind,trip_id:m.id};
+  if(kind==='validate'){
+    event.user_id=$('passenger').value;
+    // Public synthetic users only. Real identity verification is out of scope.
+    if(!/^U-00[1-6]$/.test(event.user_id)) throw Error('Usuario no encontrado');
+    const p=m.passengers.find(p=>p.user_id===event.user_id);
+    if(p?.status==='boarded') throw Error('Usuario ya validado');
+    if(p) p.status='boarded';
+    else {
+      if(m.available_seats===0) throw Error('Sin asientos disponibles');
+      const seat=Array.from({length:m.capacity},(_,i)=>i+1).find(s=>!m.passengers.some(p=>p.seat===s));
+      m.passengers.push({id:event.event_id,user_id:event.user_id,seat,status:'boarded'});m.available_seats--;
+    }
+  } else {
+    if(!m.passengers.some(p=>p.status==='boarded')) throw Error('No hay pasajeros abordados');
+    m.status='departed';
+  }
+  state.queue.push(event);save();
+  $('driver-message').textContent='Operación offline pendiente de confirmación del servidor';
+}
+async function driverAction(kind){
+  if(state.offline){offlineEvent(kind);return;}
+  if(state.queue.length) throw Error('Sincroniza los pendientes antes de operar online');
+  await api(`/api/driver/${kind}`,'POST',{trip_id:$('driver-trip').value,user_id:$('passenger').value});
+  await loadManifest();$('driver-message').textContent=kind==='validate'?'Pasajero validado':'Salida iniciada';
+}
+async function sync(){
+  if(state.offline) throw Error('Recupera conexión antes de sincronizar');
+  if(!state.queue.length){$('driver-message').textContent='No hay eventos pendientes';return;}
+  const batch=state.queue.slice(0,50);
+  const result=await api('/api/driver/sync','POST',{events:batch});
+  state.history.push(...result.results);state.history=state.history.slice(-100);
+  const acknowledged=new Set(result.results.map(r=>r.event_id));
+  state.queue=state.queue.filter(e=>!acknowledged.has(e.event_id));save();
+  if(!state.queue.length) await loadManifest();
+  const rejected=result.results.filter(r=>r.status==='rejected');
+  $('driver-message').textContent=rejected.length ? `Conflictos: ${rejected.map(r=>r.event_id+': '+r.code).join(', ')}` : 'Sincronización completada';
+}
+function bind(id,message,fn){$(id).onclick=async()=>{
+  $(id).disabled=true;
+  try{await fn();}catch(e){$(message).textContent=e.message;}finally{$(id).disabled=false;}
+};}
+let purchaseAttempt=null;
+bind('buy','rider-message',async()=>{
+  const input={trip_id:$('rider-trip').value,seat:Number($('seat').value)};
+  const signature=JSON.stringify([$('rider').value,input]);
+  if(purchaseAttempt?.signature!==signature) purchaseAttempt={signature,id:crypto.randomUUID()};
+  const r=await api('/api/reservations','POST',{...input,request_id:purchaseAttempt.id},false);
+  $('reservation').value=r.id;$('rider-message').textContent=`Compra confirmada · ${r.id} · asiento ${r.seat} · ${r.amount} CLP`;
+});
+bind('edit','rider-message',async()=>{
+  const r=await api(`/api/reservations/${$('reservation').value}`,'PATCH',{seat:Number($('seat').value)},false);
+  $('rider-message').textContent=`Reserva editada · asiento ${r.seat}`;
+});
+bind('cancel','rider-message',async()=>{
+  const r=await api(`/api/reservations/${$('reservation').value}/cancel`,'POST',{},false);
+  $('rider-message').textContent=`Reembolso simulado · ${r.amount} CLP · ${r.id}`;
+});
+bind('refresh','driver-message',loadManifest);
+bind('toggle','driver-message',async()=>{state.offline=!state.offline;save();});
+bind('validate','driver-message',()=>driverAction('validate'));
+bind('depart','driver-message',()=>driverAction('depart'));
+bind('sync','driver-message',sync);
+$('driver-trip').onchange=()=>{
+  if(state.offline || state.queue.length){$('driver-trip').value=state.manifest?.id || 'T-001';$('driver-message').textContent='Sincroniza antes de cambiar viaje';return;}
+  loadManifest().catch(e=>$('driver-message').textContent=e.message);
+};
+render();if(!state.offline && !state.queue.length) loadManifest().catch(e=>$('driver-message').textContent=e.message);
+</script>
+</html>

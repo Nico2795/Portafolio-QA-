@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "trip_id", "user_id", "seat", "status", "amount", "request_id"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^R-[a-f0-9]{12}$"},
+    "trip_id": {"type": "string"},
+    "user_id": {"type": "string"},
+    "seat": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["confirmed", "boarded", "cancelled"]},
+    "amount": {"type": "integer", "minimum": 0},
+    "request_id": {"type": "string", "minLength": 1}
+  }
+}

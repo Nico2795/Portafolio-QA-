@@ -1,0 +1,12 @@
+{
+  "users": ["U-001", "U-002", "U-003", "U-004", "U-005", "U-006"],
+  "trips": [
+    {"id": "T-001", "route": "Terminal Demo → Parque Demo", "capacity": 3, "fare": 5000},
+    {"id": "T-FULL", "route": "Terminal Demo → Campus Demo", "capacity": 2, "fare": 5000}
+  ],
+  "reservations": [
+    {"id": "R-001", "trip_id": "T-001", "user_id": "U-001", "seat": 1},
+    {"id": "R-002", "trip_id": "T-FULL", "user_id": "U-003", "seat": 1},
+    {"id": "R-003", "trip_id": "T-FULL", "user_id": "U-004", "seat": 2}
+  ]
+}
